@@ -18,7 +18,7 @@ const App = () => {
   
         </section>
       )
-  })
+  });
 
   const clearAll = () =>{
     setPerson(prevPerson => [])
