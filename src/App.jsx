@@ -1,38 +1,47 @@
-import data from "./data";
-import { useState } from "react";
-
+const url = 'https://course-api.com/react-tours-project';
+import Loading from "./components/Loading";
+import { useState,useEffect } from "react";
+import Tours from "./components/Tours";
 
 const App = () => {
 
-  const [person,setPerson] = useState(data)
-  
-  const displayPerson = person.map((person) => {
-      return(
-        <section className="person"  key={person.id} >
-      
-        <img src={person.image} alt={person.name} className="img" />
-        <div>
-        <h4>{person.name}</h4>
-        <p>{person.age} Años</p>
-        </div>
-  
-        </section>
-      )
-  });
+  const [isloading, setIsLoading] = useState(true)
+  const [tours, setTours] = useState([])
 
-  const clearAll = () =>{
-    setPerson(prevPerson => [])
+  function fetchTours(){
+    fetch(url)
+    .then((response) => response.json())
+    .then((data) => setTours(data))
+    .finally(() => setIsLoading(false))
   }
+
+  useEffect(() => {
+        setIsLoading(true)
+        fetchTours();
+  },[])
+
+  const removeTour = (id) => {
+    const newTours = tours.filter((tour) => tour.id !== id);
+    setTours(newTours);
+  }
+
+  if(tours.length === 0){
+    return <main>
+      <div className="title">
+        <h2>No tours left</h2>
+        <button type="button" style={{marginTop:"2rem"}} className="btn" onClick={fetchTours}></button>
+      </div>
+    </main>
+  }
+
 
   return (
     <main>
-      <div className="container" >
-      <h3>{person.length} Personas Cumplen Años Hoy </h3>
-      {displayPerson}
-      <button className="btn btn-block" type="button" onClick={clearAll} >Limpiar Todo</button>
-      </div>
-      </main>
-
-  )
+      {isloading 
+      ? <Loading/> : 
+      <Tours tours={tours} removeTour={removeTour} />
+      }
+    </main>
+  );
 };
 export default App;
